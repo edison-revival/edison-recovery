@@ -31,15 +31,23 @@ board. Reset or power-cycle the Edison once it says it's waiting. A board with n
 bootloader also resets itself every 1–2 minutes, so waiting works too (default timeout
 300 s, override with `XFSTK_DETECT_TIMEOUT_S`).
 
-Expected: xFSTK reports the device found and the downloads completing. The board resets,
-and about 10 seconds later the serial console shows the mainline U-Boot banner.
+Expected: xFSTK ends with `Firmware and OS download completed.` The board resets, and
+about 10 seconds later the serial console shows the `U-Boot 2026.10` banner. With no kernel
+installed yet, U-Boot then fails to boot and resets in a loop, opening a 3-second DFU
+window (`8087:0a99`) each time. That's expected.
 
 ## What it writes
 
 - **IFWI** `edison_ifwi-dbg-00.bin` to the eMMC boot partitions.
 - **U-Boot** `u-boot-edison.img` (OSIP header, U-Boot and its default environment).
 
-The rest of the eMMC (including the `factory` partition) isn't touched.
+On its first boot, U-Boot's default environment also **rewrites the GPT** (`Partitioning
+using GPT`) with the standard Edison layout and fresh partition UUIDs. The layout is the same
+as the vendor one, and partition contents (including `factory`) aren't erased, but anything
+that referred to the old partition UUIDs won't find them.
+
+The first boot after recovery may hang in the automatic 3-second DFU window without
+appearing on USB. Reset the board once; later boots behave normally.
 
 ## What's in here
 
@@ -63,8 +71,14 @@ xFSTK is LGPL-2.1 and is built from source; no binaries are distributed.
 
 ## Known pitfalls
 
+- **Mainline U-Boot's `u-boot-edison.img` can't be used with xFSTK as built.** Its OSIP
+  header file (`board/intel/edison/edison-osip.dat`) has been empty since 2020, and binman
+  places U-Boot without its 4 KiB prefix. `docker/uboot.Dockerfile` generates the header
+  (`scripts/mkosip.py`) and fixes the layout. Symptom with the stock image: xFSTK fails after
+  "sending OSIP header" with `Error Code: 4`, and logs `_num OS Images : 0`.
 - **U-Boot v2026.04 is broken for Edison**: the image lacks its 4 KiB prefix and the board
   stays in DnX. This repo pins v2026.10.
+- xFSTK exits silently on protocol errors. Run `scripts/recover.sh -v` to see why.
 - Stock xFSTK polls once a second for ~21 s and usually misses the DnX window. Use the
   patched build here.
 - If nothing is detected at all, reseat or swap the USB cable before anything else.

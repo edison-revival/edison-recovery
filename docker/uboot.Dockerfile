@@ -18,11 +18,13 @@ RUN git clone --filter=blob:none https://github.com/u-boot/u-boot.git /src \
  && git -C /src checkout --detach ${UBOOT_COMMIT}
 WORKDIR /src
 # Upstream's edison-osip.dat is empty, which makes u-boot-edison.img unusable with
-# xFSTK (see scripts/mkosip.py). Generate the real header before binman runs.
+# xFSTK (see scripts/mkosip.py). Generate the real header in the build directory, which
+# binman searches before the board directory, so the source tree stays clean (no
+# "-dirty" in the version string).
 COPY scripts/mkosip.py /usr/local/bin/
 RUN test ! -s board/intel/edison/edison-osip.dat \
  || { echo "upstream edison-osip.dat is no longer empty; review mkosip.py" >&2; exit 1; }
-RUN python3 /usr/local/bin/mkosip.py board/intel/edison/edison-osip.dat
+RUN mkdir -p /build && python3 /usr/local/bin/mkosip.py /build/edison-osip.dat
 RUN make O=/build edison_defconfig \
  && make O=/build -j"$(nproc)"
 # The IFWI expects 4 KiB of zeros in front of U-Boot; mainline's build adds them.

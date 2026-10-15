@@ -4,6 +4,9 @@
 # Writes the IFWI (edison_ifwi-dbg-00.bin) and mainline U-Boot (u-boot-edison.img,
 # which includes its environment) to the eMMC. Start this BEFORE resetting the board:
 # the DnX window is under a second per boot.
+#
+# Extra arguments are passed to xfstk-dldr-solo, e.g. `scripts/recover.sh -v`. xFSTK
+# exits silently on a protocol error unless -v is given.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -52,4 +55,5 @@ docker run --rm -t --privileged \
     --fwdnx /blobs/edison_dnx_fwr.bin \
     --fwimage /blobs/edison_ifwi-dbg-00.bin \
     --osdnx /blobs/edison_dnx_osr.bin \
+    "$@" \
     2>&1 | tee "$log"

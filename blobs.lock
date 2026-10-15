@@ -1,0 +1,11 @@
+# Intel recovery blobs. Not redistributed here: their licence is unknown.
+# fetch-blobs.sh downloads each one and refuses to continue on a checksum mismatch.
+#
+# Source: edison-fw/meta-intel-edison, pinned commit 250cb13241f1ee0438e9717b06200f1467972d68
+# (files unchanged since 2015-03-25). Checksums match the independent mirror
+# iot-alex/edison-src (master), checked 2026-10-15.
+#
+# sha256                                                            file                    url
+4407ff12a45588e3c103d7ea73f557b2f5e28b257bac1f41cfb5122f2ee68006  edison_dnx_fwr.bin      https://raw.githubusercontent.com/edison-fw/meta-intel-edison/250cb13241f1ee0438e9717b06200f1467972d68/utils/flash/ifwi/edison/edison_dnx_fwr.bin
+4cfc46b1ee891a67cb0fbc06d2585adcd8d976c63d7cdded1da6dd7fd73a689c  edison_dnx_osr.bin      https://raw.githubusercontent.com/edison-fw/meta-intel-edison/250cb13241f1ee0438e9717b06200f1467972d68/utils/flash/ifwi/edison/edison_dnx_osr.bin
+a35e9598700f1ad871ca9acc0b66850bb923a060214d8d8083e47fbeeb02e2c1  edison_ifwi-dbg-00.bin  https://raw.githubusercontent.com/edison-fw/meta-intel-edison/250cb13241f1ee0438e9717b06200f1467972d68/utils/flash/ifwi/edison/edison_ifwi-dbg-00.bin

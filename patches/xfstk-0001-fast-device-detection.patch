@@ -1,0 +1,55 @@
+Poll for the SoC every 10 ms instead of every second, and wait up to
+XFSTK_DETECT_TIMEOUT_S seconds (default 300) instead of ~21 s.
+
+A Merrifield board with a valid IFWI only exposes the mask ROM DnX device
+(8086:e005) for well under a second per boot, so a 1 s poll interval misses
+it most of the time. A board without a bootloader resets itself every
+1-2 minutes, so the timeout has to span at least one full cycle.
+
+--- a/xfstk-sources/core/downloader-solo/xfstkdownloadermain.cpp
++++ b/xfstk-sources/core/downloader-solo/xfstkdownloadermain.cpp
+@@ -24,6 +24,9 @@
+ #if defined XFSTK_OS_WIN
+ #include <windows.h>
++#else
++#include <stdlib.h>
++#include <unistd.h>
+ #endif
+
+ void show_version(void)
+@@ -37,25 +40,32 @@
+ }
+ int main(int argc, char* argv[])
+ {
+
+     int attempteddetect = 0;
++    int detecttimeout = 300;
+     XfstkStatusPfn StatusPfn = status;
+     XfstkDownloader usb20downloader;
+
+     show_version();
+
++#if !defined XFSTK_OS_WIN
++    if(getenv("XFSTK_DETECT_TIMEOUT_S"))
++        detecttimeout = atoi(getenv("XFSTK_DETECT_TIMEOUT_S"));
++#endif
++
+     if(usb20downloader.ParseCommandline(argc,argv)) {
+
++        printf("Waiting up to %d s for the Intel SoC (reset the board now)...\n", detecttimeout);
+         while(!usb20downloader.EnumerateDevice()) {
+-            if(attempteddetect > 20) {
++            if(attempteddetect > detecttimeout * 100) {
++                printf("Intel SoC Device Detection Failed after %d s\n", detecttimeout);
+                 exit(-1);
+             }
+ #if defined XFSTK_OS_WIN
+             Sleep(1000);
+ #else
+-            sleep(1);
++            usleep(10000);
+ #endif
+-            printf("Intel SoC Device Detection Failed: Attempt #%d\n",attempteddetect);
+             attempteddetect++;
+         }
+

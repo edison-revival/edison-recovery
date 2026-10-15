@@ -1,0 +1,10 @@
+# Intel Edison: let users in plugdev (and the logged-in desktop user) access the board
+# without root.
+#   8087:0a99  U-Boot DFU ("USB download gadget") - dfu-util, flashall.sh
+#   8086:e005  Mask ROM DnX download mode - xfstk-dldr-solo outside Docker
+#
+# Install: sudo cp udev/99-edison.rules /etc/udev/rules.d/
+#          sudo udevadm control --reload-rules
+# The rule applies the next time the board enumerates (e.g. its next reset).
+SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0a99", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="8086", ATTR{idProduct}=="e005", MODE="0660", GROUP="plugdev", TAG+="uaccess"

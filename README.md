@@ -77,19 +77,9 @@ Our own code is under the MIT licence (`LICENSE`). Exceptions:
   `u-boot-osip.inc` (MIT).
 - U-Boot, built by `docker/uboot.Dockerfile`, is GPL-2.0.
 
-## Tests
+## Contributing
 
-`.github/workflows/test.yml` checks that `mkosip.py` produces the known-good OSIP header
-(byte-identical to meta-intel-edison's) and runs Ruff (settings in `pyproject.toml`) and
-`shellcheck`. Locally:
-
-```
-uv run --no-project python -m unittest discover -s tests
-```
-
-```
-uvx ruff format . && uvx ruff check .
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for tests and conventions.
 
 ## Known pitfalls
 

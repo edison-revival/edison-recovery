@@ -26,8 +26,27 @@ repo at a pinned commit. After changing the U-Boot build, bump that pin there.
 
 CI: `build.yml` builds U-Boot on every push (the Dockerfile checks the prefix, OSIP header
 and layout) and uploads it; `release.yml` runs on `v*` tags and attaches `u-boot.bin`,
-`u-boot-edison.img`, `SHA256SUMS` and `VERSION` to the release. To release: tag and push,
-e.g. `git tag -a v0.1.0 -m "edison-recovery v0.1.0"` then `git push origin v0.1.0`.
+`u-boot-edison.img`, `SHA256SUMS` and `VERSION` to the release.
+
+## Layout
+
+| Path | Purpose |
+|---|---|
+| `docker/xfstk.Dockerfile` | Builds `xfstk-dldr-solo` from [edison-fw/xFSTK](https://github.com/edison-fw/xFSTK) v1.8.6 (pinned commit) on Ubuntu 24.04 |
+| `patches/` | Patches applied to xFSTK: 10 ms device polling and a longer timeout, so the sub-second DnX window isn't missed |
+| `docker/uboot.Dockerfile` | Builds mainline U-Boot v2026.10 `edison_defconfig` (pinned commit); checks the 4 KiB zero prefix |
+| `scripts/mkosip.py` | Writes the OSIP header that mainline's image lacks |
+| `blobs.lock` | URLs and SHA256 checksums of the Intel DnX/IFWI blobs |
+| `scripts/fetch-blobs.sh` | Downloads the blobs into `blobs/` and refuses to continue on a mismatch |
+| `scripts/build.sh`, `scripts/recover.sh` | Build, then recover |
+
+## Releasing
+
+1. Make sure `main` is green. A U-Boot change needs a hardware test first: recover or
+   flash a real board with the CI build of the commit you'll tag.
+2. Tag and push: `git tag -a v0.2.0 -m "edison-recovery v0.2.0"` then
+   `git push origin v0.2.0`.
+3. The release workflow does the rest. If U-Boot changed, bump the pin in edison-image.
 
 ## Conventions
 

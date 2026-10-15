@@ -67,17 +67,6 @@ that referred to the old partition UUIDs won't find them.
 The first boot after recovery may hang in the automatic 3-second DFU window without
 appearing on USB. Reset the board once; later boots behave normally.
 
-## What's in here
-
-| Path | Purpose |
-|---|---|
-| `docker/xfstk.Dockerfile` | Builds `xfstk-dldr-solo` from [edison-fw/xFSTK](https://github.com/edison-fw/xFSTK) v1.8.6 (pinned commit) on Ubuntu 24.04 |
-| `patches/` | Patches applied to xFSTK: 10 ms device polling and a longer timeout, so the sub-second DnX window isn't missed |
-| `docker/uboot.Dockerfile` | Builds mainline U-Boot v2026.10 `edison_defconfig` (pinned commit); checks the 4 KiB zero prefix |
-| `blobs.lock` | URLs and SHA256 checksums of the Intel DnX/IFWI blobs |
-| `scripts/fetch-blobs.sh` | Downloads the blobs into `blobs/` and refuses to continue on a mismatch |
-| `scripts/build.sh`, `scripts/recover.sh` | Build, then recover |
-
 ## Blobs and licences
 
 The Intel IFWI and DnX images are **not** in this repo: no licence covering their
@@ -97,7 +86,8 @@ Our own code is under the MIT licence (`LICENSE`). Exceptions:
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for tests and conventions.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the repo layout, tests, releasing and
+conventions.
 
 ## Known pitfalls
 

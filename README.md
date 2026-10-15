@@ -69,6 +69,23 @@ same checksums match the independent `iot-alex/edison-src` mirror.
 
 xFSTK is LGPL-2.1 and is built from source; no binaries are distributed.
 
+## Licence
+
+Our own code is under the MIT licence (`LICENSE`). Exceptions:
+- `patches/xfstk-*.patch` modify xFSTK and are LGPL-2.1, like xFSTK.
+- `scripts/mkosip.py` is our code; the OSIP values it writes match meta-intel-edison's
+  `u-boot-osip.inc` (MIT).
+- U-Boot, built by `docker/uboot.Dockerfile`, is GPL-2.0.
+
+## Tests
+
+`.github/workflows/test.yml` checks that `mkosip.py` produces the known-good OSIP header
+(byte-identical to meta-intel-edison's) and runs `shellcheck`. Locally:
+
+```
+uv run --no-project python -m unittest discover -s tests
+```
+
 ## Known pitfalls
 
 - **Mainline U-Boot's `u-boot-edison.img` can't be used with xFSTK as built.** Its OSIP

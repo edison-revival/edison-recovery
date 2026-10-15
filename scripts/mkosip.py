@@ -77,8 +77,12 @@ def osip_header():
     return bytes(hdr)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
+def main(argv):
+    if len(argv) != 2:
         sys.exit(__doc__)
-    with open(sys.argv[1], "wb") as f:
+    with open(argv[1], "wb") as f:
         f.write(osip_header())
+
+
+if __name__ == "__main__":
+    main(sys.argv)

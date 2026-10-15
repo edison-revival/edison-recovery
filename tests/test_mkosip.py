@@ -38,9 +38,9 @@ class OsipHeaderTests(unittest.TestCase):
 
     def test_os_image_descriptor(self):
         lba, load, entry, blocks = struct.unpack_from("<IIII", self.hdr, 0x24)
-        self.assertEqual(lba, 2048)                   # u-boot0, 1 MiB into the eMMC
-        self.assertEqual(entry - load, 0x1000)        # past U-Boot's 4 KiB prefix
-        self.assertEqual(entry, 0x01101000)           # U-Boot's CONFIG_TEXT_BASE
+        self.assertEqual(lba, 2048)  # u-boot0, 1 MiB into the eMMC
+        self.assertEqual(entry - load, 0x1000)  # past U-Boot's 4 KiB prefix
+        self.assertEqual(entry, 0x01101000)  # U-Boot's CONFIG_TEXT_BASE
         self.assertEqual(blocks * 512, 6 * 1024 * 1024)
 
     def test_protective_mbr_entry(self):

@@ -80,10 +80,15 @@ Our own code is under the MIT licence (`LICENSE`). Exceptions:
 ## Tests
 
 `.github/workflows/test.yml` checks that `mkosip.py` produces the known-good OSIP header
-(byte-identical to meta-intel-edison's) and runs `shellcheck`. Locally:
+(byte-identical to meta-intel-edison's) and runs Ruff (settings in `pyproject.toml`) and
+`shellcheck`. Locally:
 
 ```
 uv run --no-project python -m unittest discover -s tests
+```
+
+```
+uvx ruff format . && uvx ruff check .
 ```
 
 ## Known pitfalls

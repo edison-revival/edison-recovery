@@ -24,6 +24,11 @@ shellcheck scripts/*.sh
 [edison-image](https://github.com/edison-revival/edison-image) builds U-Boot from this
 repo at a pinned commit. After changing the U-Boot build, bump that pin there.
 
+CI: `build.yml` builds U-Boot on every push (the Dockerfile checks the prefix, OSIP header
+and layout) and uploads it; `release.yml` runs on `v*` tags and attaches `u-boot.bin`,
+`u-boot-edison.img`, `SHA256SUMS` and `VERSION` to the release. To release: tag and push,
+e.g. `git tag -a v0.1.0 -m "edison-recovery v0.1.0"` then `git push origin v0.1.0`.
+
 ## Conventions
 
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org)

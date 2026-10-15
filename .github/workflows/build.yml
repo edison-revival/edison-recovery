@@ -1,0 +1,41 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call: # release.yml builds tags through this workflow
+
+permissions:
+  contents: read
+
+jobs:
+  uboot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The Dockerfile checks the 4 KiB prefix, the OSIP header and the image layout.
+      - name: Build U-Boot
+        run: scripts/build.sh uboot
+
+      - name: Summary
+        run: |
+          {
+            echo "### U-Boot $(cat out/uboot/VERSION)"
+            echo '```'
+            cat out/uboot/SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: uboot-${{ github.sha }}
+          path: |
+            out/uboot/u-boot.bin
+            out/uboot/u-boot-edison.img
+            out/uboot/SHA256SUMS
+            out/uboot/VERSION
+          retention-days: 7

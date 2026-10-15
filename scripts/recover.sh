@@ -5,23 +5,33 @@
 # which includes its environment) to the eMMC. Start this BEFORE resetting the board:
 # the DnX window is under a second per boot.
 #
-# Extra arguments are passed to xfstk-dldr-solo, e.g. `scripts/recover.sh -v`. xFSTK
-# exits silently on a protocol error unless -v is given.
+# Usage: scripts/recover.sh [--uboot DIR] [xfstk-dldr-solo options]
+#   --uboot DIR  U-Boot files from a release download (u-boot-edison.img, VERSION,
+#                SHA256SUMS) instead of the local build in out/uboot.
+# Other arguments are passed to xfstk-dldr-solo, e.g. -v: xFSTK exits silently on a
+# protocol error unless -v is given.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root"
 
+uboot="$root/out/uboot"
+if [ "${1:-}" = --uboot ]; then
+    uboot="$(cd "${2:?--uboot needs a directory}" && pwd)"
+    shift 2
+fi
+
 "$root/scripts/fetch-blobs.sh"
 
-if [ ! -f out/uboot/u-boot-edison.img ]; then
-    echo "out/uboot/u-boot-edison.img not found; run scripts/build.sh first" >&2
+if [ ! -f "$uboot/u-boot-edison.img" ]; then
+    echo "$uboot/u-boot-edison.img not found: run scripts/build.sh, or download the" >&2
+    echo "U-Boot files from a release and pass --uboot DIR" >&2
     exit 1
 fi
-(cd out/uboot && sha256sum -c --quiet SHA256SUMS)
+(cd "$uboot" && sha256sum -c --quiet --ignore-missing SHA256SUMS)
 
 if ! docker image inspect edison-recovery/xfstk >/dev/null 2>&1; then
-    echo "edison-recovery/xfstk image not found; run scripts/build.sh first" >&2
+    echo "edison-recovery/xfstk image not found; run scripts/build.sh xfstk first" >&2
     exit 1
 fi
 
@@ -30,7 +40,7 @@ log="logs/recover-$(date +%Y%m%d-%H%M%S).log"
 
 cat <<EOF
 
-About to write the IFWI and U-Boot $(cat out/uboot/VERSION) to the Edison's eMMC.
+About to write the IFWI and U-Boot $(cat "$uboot/VERSION") to the Edison's eMMC.
   1. Edison J16 (USB OTG) connected to this machine, SW1 towards the micro-USB ports.
   2. Serial console on J3 open and logging, if you can.
   3. When xFSTK says it's waiting, power-cycle or reset the board.
@@ -48,7 +58,7 @@ docker run --rm -t --privileged \
     -e XFSTK_DETECT_TIMEOUT_S="${XFSTK_DETECT_TIMEOUT_S:-300}" \
     -v /dev/bus/usb:/dev/bus/usb \
     -v "$root/blobs:/blobs:ro" \
-    -v "$root/out/uboot:/uboot:ro" \
+    -v "$uboot:/uboot:ro" \
     edison-recovery/xfstk \
     --gpflags 0x80000007 \
     --osimage /uboot/u-boot-edison.img \

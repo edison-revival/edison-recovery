@@ -17,13 +17,29 @@ U-Boot banner follows (see `edison-docs/runbooks/stage0-diagnose.md`).
 
 ## Usage
 
-```
-scripts/build.sh
-```
+Clone this repo (or download a [release](https://github.com/edison-revival/edison-recovery/releases)'s
+source), then either:
 
-```
-scripts/recover.sh
-```
+- **With a release's prebuilt U-Boot** (download `u-boot-edison.img`, `VERSION` and
+  `SHA256SUMS` from the release into a folder):
+
+  ```
+  scripts/build.sh xfstk
+  ```
+
+  ```
+  scripts/recover.sh --uboot path/to/that/folder
+  ```
+
+- **Building everything yourself:**
+
+  ```
+  scripts/build.sh
+  ```
+
+  ```
+  scripts/recover.sh
+  ```
 
 `build.sh` builds the xFSTK container image and mainline U-Boot (`out/uboot/`).
 `recover.sh` downloads and verifies the Intel blobs, then starts xFSTK waiting for the
@@ -33,8 +49,10 @@ bootloader also resets itself every 1–2 minutes, so waiting works too (default
 
 Expected: xFSTK ends with `Firmware and OS download completed.` The board resets, and
 about 10 seconds later the serial console shows the `U-Boot 2026.10` banner. With no kernel
-installed yet, U-Boot then fails to boot and resets in a loop, opening a 3-second DFU
-window (`8087:0a99`) each time. That's expected.
+installed yet, U-Boot then fails to boot and resets in a loop, opening a short DFU window
+(`8087:0a99`) each time. That's expected: next, flash an OS with
+[edison-image](https://github.com/edison-revival/edison-image)'s `flash.py`, which
+catches that window.
 
 ## What it writes
 

@@ -1,0 +1,59 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # create the release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: uboot-${{ github.sha }}
+          path: dist
+
+      - name: Write release notes
+        run: |
+          cat > notes.md <<EOF
+          Recovery tooling for the Intel Edison: brings a board with a missing or broken
+          bootloader back to mainline U-Boot through its mask-ROM download mode (DnX) with
+          xFSTK. See the [README](https://github.com/edison-revival/edison-recovery/blob/$GITHUB_REF_NAME/README.md).
+
+          **Attached:** mainline U-Boot $(cat dist/VERSION), built from the commit pinned in
+          \`docker/uboot.Dockerfile\`, with the OSIP header and layout fixes this repo applies
+          (\`u-boot-edison.img\` for xFSTK recovery, \`u-boot.bin\` for DFU). Use them with
+          \`scripts/recover.sh --uboot DIR\` to skip building U-Boot; the xFSTK container is
+          still built locally (\`scripts/build.sh xfstk\`).
+
+          The Intel IFWI and DnX files are **not** attached (their licence is unknown):
+          \`scripts/fetch-blobs.sh\` downloads them and verifies their checksums.
+
+          U-Boot is GPL-2.0; its corresponding source is the pinned upstream commit plus this
+          repo's \`scripts/mkosip.py\` and \`docker/uboot.Dockerfile\`.
+          EOF
+          cat notes.md
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --verify-tag \
+            --title "edison-recovery $GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --generate-notes \
+            $prerelease

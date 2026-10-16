@@ -21,7 +21,7 @@ uvx ruff format . && uvx ruff check .
 shellcheck scripts/*.sh
 ```
 
-[edison-image](https://github.com/edison-revival/edison-image) builds U-Boot from this
+[edison-image](https://github.com/open-edison/edison-image) builds U-Boot from this
 repo at a pinned commit. After changing the U-Boot build, bump that pin there.
 
 CI: `build.yml` builds U-Boot on every push (the Dockerfile checks the prefix, OSIP header
@@ -63,4 +63,4 @@ and layout) and uploads it; `release.yml` runs on `v*` tags and attaches `u-boot
   request a month with updates.
 - **Hardware changes need a hardware test.** Note what you tested on a real board in the
   pull request; findings go in
-  [edison-docs](https://github.com/edison-revival/edison-docs).
+  [edison-docs](https://github.com/open-edison/edison-docs).

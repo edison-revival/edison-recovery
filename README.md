@@ -17,7 +17,7 @@ U-Boot banner follows (see `edison-docs/runbooks/stage0-diagnose.md`).
 
 ## Usage
 
-Clone this repo (or download a [release](https://github.com/edison-revival/edison-recovery/releases)'s
+Clone this repo (or download a [release](https://github.com/open-edison/edison-recovery/releases)'s
 source), then either:
 
 - **With a release's prebuilt U-Boot** (download `u-boot-edison.img`, `VERSION` and
@@ -51,7 +51,7 @@ Expected: xFSTK ends with `Firmware and OS download completed.` The board resets
 about 10 seconds later the serial console shows the `U-Boot 2026.10` banner. With no kernel
 installed yet, U-Boot then fails to boot and resets in a loop, opening a short DFU window
 (`8087:0a99`) each time. That's expected: next, flash an OS with
-[edison-image](https://github.com/edison-revival/edison-image)'s `flash.py`, which
+[edison-image](https://github.com/open-edison/edison-image)'s `flash.py`, which
 catches that window.
 
 ## What it writes

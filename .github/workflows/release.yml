@@ -29,7 +29,7 @@ jobs:
           cat > notes.md <<EOF
           Recovery tooling for the Intel Edison: brings a board with a missing or broken
           bootloader back to mainline U-Boot through its mask-ROM download mode (DnX) with
-          xFSTK. See the [README](https://github.com/edison-revival/edison-recovery/blob/$GITHUB_REF_NAME/README.md).
+          xFSTK. See the [README](https://github.com/open-edison/edison-recovery/blob/$GITHUB_REF_NAME/README.md).
 
           **Attached:** mainline U-Boot $(cat dist/VERSION), built from the commit pinned in
           \`docker/uboot.Dockerfile\`, with the OSIP header and layout fixes this repo applies
